@@ -50,8 +50,8 @@ class Model:
 
     def set_key(self):
         hex_form = hex(self.s)[2:]
-        if len(hex_form) == 1 and hex_form == "0":
-            hex_form = hex_form + "0"
+        if len(hex_form) == 1 and hex_form in ["0", "1"]:
+            hex_form = "0" + hex_form
         self.key = SHA3_256.new(bytes.fromhex(hex_form)).digest()[0:16]
 
     def get_key(self) -> bytes:
@@ -73,7 +73,7 @@ class Model:
 
     def decrypt_message(self) -> str:
         cipher = AES.new(self.key, AES.MODE_CBC, self.iv)
-        return cipher.decrypt(self.partner_message).decode("utf-8")
+        return cipher.decrypt(self.partner_message).decode("ISO-8859-1")
 
 
 

@@ -25,8 +25,16 @@ def generate_keypair(prime_bits_size: int, e: int = 65537):
     p = getPrime(prime_bits_size)
     q = getPrime(prime_bits_size)
 
+    #if p ends up being the same as q loop until not equal
+    if p == q:
+        while True:
+            p = getPrime(prime_bits_size)
+            q = getPrime(prime_bits_size)
+            if p != q:
+                break
+
     n = p * q
-    phi = (p - 1)(q - 1)
+    phi = (p - 1) * (q - 1)
     d = mod_inverse(e, phi)
 
     public_key = (e, n)
@@ -45,6 +53,10 @@ def int_to_str (int_message:int) -> str:
 def encrypt(message:int, public_key:tuple[int, int]) -> int:
     e = public_key[0]
     n = public_key[1]
+
+    # message must be smaller than n
+    if message > n or message < 0:
+        return ValueError("Message must be smaller than n or greater than 0")
     # message ^ e mod n
     return pow(message, e, n)
 

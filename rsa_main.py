@@ -67,5 +67,29 @@ def main():
     print(f"Mallory's AES key: {mallory_key.hex()}")
     print(f"Mallory recovered m0: {recovered_m0}")
 
+    # Signature forging/malleability
+
+    m1 = 12 # 2 messages
+    m2 = 25
+
+    sig1 = decrypt(m1, priv) # signatures created using sign = m^d mod n
+    sig2 = decrypt(m2, priv)
+
+    # Mallory multiples m1 and m2 to make m3
+    m3 = (m1 * m2) % pub[1]
+    # Mallory creates 3rd signature from multiplying 
+    sig3 = (sig1 * sig2) % pub[1]
+
+    # Anyone, including Bob, verifies with Alice's public key
+    verified_message = encrypt(sig3, pub)  # sig3^e mod n
+    is_valid = verified_message == m3
+
+    print("\n--- RSA signature malleability attack ---")
+    print(f"m1: {m1}")
+    print(f"m2: {m2}")
+    print(f"m3 = m1 * m2 mod n: {m3}")
+    print(f"Mallory forged a signature for m3: {sig3}")
+    print(f"Bob verifies forged signature: {is_valid}")
+
 if __name__ == '__main__':
     main()

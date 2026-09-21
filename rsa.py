@@ -42,14 +42,6 @@ def generate_keypair(prime_bits_size: int, e: int = 65537):
 
     return public_key, private_key
 
-# helper functions to convert messages to and from strings/ints
-def str_to_int(message:str) -> int:
-    return int.from_bytes(message.encode("utf-8"), byteorder = "big")
-
-def int_to_str (int_message:int) -> str:
-    byte_len = (int_message.bit_length() + 7)//8
-    return int_message.to_bytes(byte_len, byteorder = "big").decode("utf-8")
-
 def encrypt(message:int, public_key:tuple[int, int]) -> int:
     e = public_key[0]
     n = public_key[1]

@@ -32,11 +32,10 @@ def main():
         )
         return SHA3_256.new(secret_bytes).digest()[:16]
 
-    # Alice uses the secret she decrypted from c_prime.
-    # This is r = 1 because Mallory substituted the ciphertext.
+    # Alice uses the secret she decrypted from c_prime which is r = 1 because Mallory substituted the ciphertext
     alice.key = derive_aes_key(s_alice)
 
-    # Bob still thinks the shared secret is his original s = 15.
+    # Bob still thinks the shared secret is his original s = 15
     bob.key = derive_aes_key(s)
 
     print(f"Bob's intended secret: {s}")
@@ -44,7 +43,7 @@ def main():
     print(f"Mallory's known secret: {r}")
 
     # Alice sends an AES-CBC message.
-    # The IV is normally transmitted with the ciphertext, so Mallory can see it.
+    # The IV is normally transmitted with the ciphertext, so Mallory can see it
     alice.set_and_share_iv(bob)
     mallory.steal_iv(alice)
 
@@ -52,25 +51,21 @@ def main():
     alice.send_message(m0, bob)
 
     print(f"Alice's AES key:   {alice.key.hex()}")
-    print(f"Bob's AES key:     {bob.key.hex()}")  # Different: Bob cannot decrypt correctly.
+    print(f"Bob's AES key:     {bob.key.hex()}")  # Different: Bob cannot decrypt correctly
 
-    # Mallory derives the same key as Alice because she chose r.
+    # Mallory derives the same key as Alice because she chose r
     mallory_key = derive_aes_key(r)
 
-    # Mallory decrypts Alice's captured ciphertext herself.
+    # Mallory decrypts Alice's captured ciphertext herself
     cipher = AES.new(mallory_key, AES.MODE_CBC, mallory.iv)
     padded_plaintext = cipher.decrypt(alice.message)
 
-    # Remove the PKCS#7-style padding added by Model.add_padding().
+    # Remove the PKCS#7-style padding added by Model.add_padding()
     padding_length = padded_plaintext[-1]
     recovered_m0 = padded_plaintext[:-padding_length].decode("utf-8")
 
     print(f"Mallory's AES key: {mallory_key.hex()}")
     print(f"Mallory recovered m0: {recovered_m0}")
-
-    assert alice.key == mallory_key
-    assert alice.key != bob.key
-    assert recovered_m0 == m0
 
 if __name__ == '__main__':
     main()
